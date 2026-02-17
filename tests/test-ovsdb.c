@@ -2354,6 +2354,7 @@ print_idl(struct ovsdb_idl *idl, int step, bool terse)
     const struct idltest_simple *s;
     const struct idltest_link1 *l1;
     const struct idltest_link2 *l2;
+    const struct idltest_link3 *l3;
     const struct idltest_singleton *sng;
     int n = 0;
 
@@ -2367,6 +2368,10 @@ print_idl(struct ovsdb_idl *idl, int step, bool terse)
     }
     IDLTEST_LINK2_FOR_EACH (l2, idl) {
         print_idl_row_link2(l2, step, terse);
+        n++;
+    }
+    IDLTEST_LINK3_FOR_EACH (l3, idl) {
+        print_idl_row_link3(l3, step, terse);
         n++;
     }
     IDLTEST_SIMPLE3_FOR_EACH (s3, idl) {
