@@ -5235,9 +5235,23 @@ group_set_selection_method(struct group_dpif *group)
             group->selection_method = SEL_METHOD_DEFAULT;
         }
     } else if (!strcmp(selection_method, "dp_hash")) {
-        VLOG_DBG("Selection method specified: dp_hash.");
+        /* Make dp_hash behave like hash method */
+        VLOG_DBG("Selection method specified: hash.");
+        if (props->fields.values_size > 0) {
+            /* Controller has specified hash fields. */
+            struct ds s = DS_EMPTY_INITIALIZER;
+            oxm_format_field_array(&s, &props->fields);
+            VLOG_DBG("Hash fields: %s", ds_cstr(&s));
+            ds_destroy(&s);
+            group->selection_method = SEL_METHOD_HASH;
+        } else {
+            /* No hash fields. Fall back to original default hashing. */
+            VLOG_DBG("No hash fields. Falling back to default hash method.");
+            group->selection_method = SEL_METHOD_DEFAULT;
+        }
+        //VLOG_DBG("Selection method specified: dp_hash.");
         /* Try to use dp_hash if possible at all. */
-        if (group_setup_dp_hash_table(group, 0)) {
+        /*if (group_setup_dp_hash_table(group, 0)) {
             group->selection_method = SEL_METHOD_DP_HASH;
             group->hash_alg = props->selection_method_param >> 32;
             if (group->hash_alg >= __OVS_HASH_MAX) {
@@ -5248,11 +5262,11 @@ group_set_selection_method(struct group_dpif *group)
             group->hash_basis = (uint32_t) props->selection_method_param;
             VLOG_DBG("Use dp_hash with %d hash values using algorithm %d.",
                      group->hash_mask + 1, group->hash_alg);
-        } else {
+        } else {*/
             /* Fall back to original default hashing in slow path. */
-            VLOG_DBG("Falling back to default hash method.");
+        /*    VLOG_DBG("Falling back to default hash method.");
             group->selection_method = SEL_METHOD_DEFAULT;
-        }
+        }*/
     } else if (!strcmp(selection_method, "hash")) {
         VLOG_DBG("Selection method specified: hash.");
         if (props->fields.values_size > 0) {

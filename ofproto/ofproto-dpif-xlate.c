@@ -4901,23 +4901,22 @@ pick_dp_hash_select_group(struct xlate_ctx *ctx, struct group_dpif *group)
         ctx_trigger_recirculate_with_hash(ctx, hash_alg, group->hash_basis);
         return NULL;
     } else {
-        uint32_t hash_mask = group->hash_mask;
-        ctx->wc->masks.dp_hash |= hash_mask;
+        //uint32_t hash_mask = group->hash_mask;
+        //ctx->wc->masks.dp_hash |= hash_mask;
 
         /* Starting from the original masked dp_hash value iterate over the
          * hash mapping table to find the first live bucket. As the buckets
          * are quasi-randomly spread over the hash values, this maintains
          * a distribution according to bucket weights even when some buckets
          * are non-live. */
-        for (int i = 0; i <= hash_mask; i++) {
+        return group_best_live_bucket(ctx, group, dp_hash);
+        /*for (int i = 0; i <= hash_mask; i++) {
             struct ofputil_bucket *b =
                     group->hash_map[(dp_hash + i) & hash_mask];
             if (bucket_is_alive(ctx, group, b, 0)) {
                 return b;
             }
-        }
-
-        return NULL;
+        }*/
     }
 }
 
